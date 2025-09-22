@@ -1,63 +1,112 @@
 // for fields
 let fields = [
     null,
-    'circle',
     null,
     null,
     null,
     null,
-    'cross',
+    null,
+    null,
     null,
     null
 ];
+
+let currentShape = 'circle'; // Startspieler
 
 function init() {
     render();
 }
 
 
-// Der Spielstand – leeres Feld = ""
-let board = [
-    ["", "", ""],
-    ["", "", ""],
-    ["", "", ""]
-];
+// // Funktion zum Rendern des Spielfelds
+// function render() {
+//     const contentDiv = document.getElementById("content");
+// 
+//     let tableHtml = "<table>";
+// 
+//     for (let i = 0; i < 3; i++) { // Zeilen
+//         tableHtml += "<tr>";
+//         for (let j = 0; j < 3; j++) { // Spalten
+//             const index = i * 3 + j;
+//             let symbol = '';
+// 
+//             if (fields[index] === 'circle') {
+//                 symbol = generateCircleSVG();
+//             } else if (fields[index] === 'cross') {
+//                 symbol = generateCrossSVG();
+//             }
+//             tableHtml += `<td>${symbol}</td>`;
+//         }
+//         tableHtml += "</tr>";
+//     }
+//     tableHtml += "</table>";
+// 
+//     contentDiv.innerHTML = tableHtml;
+// }
 
-// Funktion zum Rendern des Spielfelds
+
+// 🧠 Klick-Handler für ein Feld
+function handleClick(index) {
+    if (fields[index] !== null) return; // Sicherheitscheck
+
+    const cell = document.getElementById(`cell-${index}`);
+
+    // Setze Wert im Array
+    fields[index] = currentShape;
+
+    // SVG generieren & einfügen
+    if (currentShape === 'circle') {
+        cell.innerHTML = generateCircleSVG();
+    } else {
+        cell.innerHTML = generateCrossSVG();
+    }
+
+    // Klickfunktion entfernen
+    cell.onclick = null;
+
+    // Spieler wechseln
+    currentShape = currentShape === 'circle' ? 'cross' : 'circle';
+    /* ist eine kompakte If-Else-Abkürzung in JavaScript – auch genannt: Ternärer Operator.
+        Was macht die Zeile?
+        Diese Zeile wechselt ab zwischen "circle" und "cross".
+        Wenn currentShape gerade "circle" ist, wird es auf "cross" gesetzt.
+        Wenn es "cross" ist, wird es auf "circle" gesetzt.
+        Das ist nützlich, um abwechselnd zwei Spieler in einem Spiel zu behandeln.
+            Langform als if/else
+            Die gleiche Logik in ausführlicher Schreibweise:
+                if (currentShape === 'circle') {
+                    currentShape = 'cross';
+                } else {
+                    currentShape = 'circle';
+                }   
+    */
+}
+
+// 🧱 Tabelle rendern
 function render() {
     const contentDiv = document.getElementById("content");
-
     let tableHtml = "<table>";
 
-    for (let i = 0; i < 3; i++) { // Zeilen
+    for (let i = 0; i < 3; i++) {
         tableHtml += "<tr>";
-        for (let j = 0; j < 3; j++) { // Spalten
+        for (let j = 0; j < 3; j++) {
             const index = i * 3 + j;
-            let symbol = '';
+            const symbol = fields[index];
+            let cellContent = "";
 
-            if (fields[index] === 'circle') {
-                symbol = generateCircleSVG();
-            } else if (fields[index] === 'cross') {
-                symbol = generateCrossSVG();
+            if (symbol === 'circle') {
+                cellContent = generateCircleSVG();
+            } else if (symbol === 'cross') {
+                cellContent = generateCrossSVG();
             }
-            tableHtml += `<td>${symbol}</td>`;
+
+            tableHtml += `<td id="cell-${index}" onclick="handleClick(${index})">${cellContent}</td>`;
         }
         tableHtml += "</tr>";
     }
+
     tableHtml += "</table>";
-
     contentDiv.innerHTML = tableHtml;
-}
-
-// Beispiel-Click-Handler
-let currentPlayer = "X";
-
-function handleClick(row, col) {
-    if (board[row][col] === "") {
-        board[row][col] = currentPlayer;
-        currentPlayer = currentPlayer === "X" ? "O" : "X";
-        render();
-    }
 }
 
 function generateCircleSVG() {
