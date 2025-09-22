@@ -1,16 +1,56 @@
+/* http://127.0.0.1:5500/img/TicTacToe%20Mockup.JPG
+    zeigt die Idee des Layouts im Browser */
 
+
+/* Gesamte Seite */
+body {
+    background-color: #323232;
+    color: darkorange;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+}
+
+h1 {
+    font-size: 50px;
+}
+
+/* Tabelle */
 table {
-  border-collapse: collapse;
-  margin: 20px 0;
+    border-collapse: collapse;
+    /* Wichtig für innere Linien */
+    margin-top: 100px;
 }
 
+/* Zellen */
 td {
-  width: 60px;
-  height: 60px;
-  text-align: center;
-  vertical-align: middle;
-  font-size: 2em;
-  border: 1px solid #333;
-  cursor: pointer;
+    width: 100px;
+    height: 100px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 3em;
+    color: white;
+    border: 6px solid white;
+    cursor: pointer;
 }
 
+/* Nur innere Linien sichtbar machen */
+td:first-child {
+    border-left: none;
+}
+
+td:last-child {
+    border-right: none;
+}
+
+tr:first-child td {
+    border-top: none;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
