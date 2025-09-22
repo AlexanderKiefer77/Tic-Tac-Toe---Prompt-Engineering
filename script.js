@@ -24,6 +24,7 @@ const winPatterns = [
     [2, 4, 6]  // Diagonale /
 ];
 
+
 function init() {
     render();
 }
@@ -63,11 +64,32 @@ function handleClick(cell, index) {
             const winningPattern = getWinningPattern();
             drawWinningLine(winningPattern);
         }
+
+        const result = checkWinner();
+        if (result) {
+            drawWinningLine(result.pattern);
+            showWinnerText(`${result.winner === 'circle' ? 'Kreis' : 'Kreuz'} gewinnt!`);
+            disableAllClicks();
+            return;
+        }
+
+        // Unentschieden prüfen
+        if (fields.every(field => field !== null)) {
+            showWinnerText("Unentschieden!");
+        }
+
     }
 }
 
 function isGameFinished() {
     return getWinningPattern() !== null || fields.every(field => field !== null);
+}
+
+function disableAllClicks() {
+    const cells = document.querySelectorAll('td');
+    cells.forEach(cell => {
+        cell.onclick = null;
+    });
 }
 
 function getWinningPattern() {
@@ -81,8 +103,8 @@ function getWinningPattern() {
 }
 
 function drawWinningLine(pattern) {
-    const lineColor = '#FFFFFF'; // Weiß
-    const lineWidth = 6; // 6px breit
+    const lineColor = '#FFFFFF';
+    const lineWidth = 6;
 
     const cells = document.querySelectorAll('td');
     const startCell = cells[pattern[0]];
@@ -91,31 +113,55 @@ function drawWinningLine(pattern) {
     const startRect = startCell.getBoundingClientRect();
     const endRect = endCell.getBoundingClientRect();
 
-    // Mittelpunkt der Start- und Endzelle berechnen
+    // Mittelpunkt der Start- und Endzelle
     const startX = startRect.left + startRect.width / 2;
     const startY = startRect.top + startRect.height / 2;
     const endX = endRect.left + endRect.width / 2;
     const endY = endRect.top + endRect.height / 2;
 
+    // Richtung & Länge
     const deltaX = endX - startX;
     const deltaY = endY - startY;
+    const angle = Math.atan2(deltaY, deltaX); // in rad
+    const angleDeg = angle * (180 / Math.PI);
+    const originalLength = Math.hypot(deltaX, deltaY);
 
-    const lineLength = Math.hypot(deltaX, deltaY);
-    const angleDeg = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+    // 💡 Verlängerung (z. B. 40px insgesamt – 20px je Seite)
+    const extraLength = 40;
+    const totalLength = originalLength + extraLength;
+
+    // Startpunkt nach hinten verschieben (entlang der Linie)
+    const adjustedStartX = startX - Math.cos(angle) * (extraLength / 2);
+    const adjustedStartY = startY - Math.sin(angle) * (extraLength / 2);
 
     const line = document.createElement('div');
+    line.classList.add('winning-line'); // für späteres Entfernen
     line.style.position = 'absolute';
-    line.style.width = `${lineLength}px`;
+    line.style.width = `${totalLength}px`;
     line.style.height = `${lineWidth}px`;
     line.style.backgroundColor = lineColor;
-    line.style.left = `${startX}px`;
-    line.style.top = `${startY - lineWidth / 2}px`; // Vertikal zentrieren
+    line.style.left = `${adjustedStartX}px`;
+    line.style.top = `${adjustedStartY - lineWidth / 2}px`; // vertikal zentrieren
     line.style.transform = `rotate(${angleDeg}deg)`;
     line.style.transformOrigin = '0 50%';
     line.style.zIndex = 10;
-    line.style.transition = 'width 0.3s ease';
-    line.classList.add('winning-line');
-    document.body.appendChild(line); // besser als in #content
+    line.style.pointerEvents = 'none';
+
+    document.body.appendChild(line);
+}
+
+
+function checkWinner() {  
+    for (const pattern of winPatterns) {
+        const [a, b, c] = pattern;
+        if (fields[a] && fields[a] === fields[b] && fields[b] === fields[c]) {
+            return {
+                winner: fields[a],  // 'circle' oder 'cross'
+                pattern             // z. B. [0, 1, 2]
+            };
+        }
+    }
+    return null; // Kein Gewinner
 }
 
 function restartGame() {
@@ -128,7 +174,15 @@ function restartGame() {
     // 3. SVG-Gewinnerlinie(n) entfernen (wenn du sie im <body> hinzugefügt hast)
     const lines = document.querySelectorAll('.winning-line');
     lines.forEach(line => line.remove());
-   
+
+    // Gewinner-Text leeren
+    showWinnerText('');
+
     // 4. Tabelle neu rendern
     render();
+}
+
+function showWinnerText(text) {
+    const winnerDiv = document.getElementById("winner-text");
+    winnerDiv.textContent = text;
 }
