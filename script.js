@@ -114,7 +114,21 @@ function drawWinningLine(pattern) {
     line.style.transformOrigin = '0 50%';
     line.style.zIndex = 10;
     line.style.transition = 'width 0.3s ease';
-
+    line.classList.add('winning-line');
     document.body.appendChild(line); // besser als in #content
 }
 
+function restartGame() {
+    // 1. Felder leeren
+    fields = Array(9).fill(null);
+
+    // 2. Spieler zurücksetzen
+    currentShape = 'circle';
+
+    // 3. SVG-Gewinnerlinie(n) entfernen (wenn du sie im <body> hinzugefügt hast)
+    const lines = document.querySelectorAll('.winning-line');
+    lines.forEach(line => line.remove());
+   
+    // 4. Tabelle neu rendern
+    render();
+}

@@ -58,3 +58,18 @@ tr:first-child td {
 tr:last-child td {
     border-bottom: none;
 }
+
+#restart-btn {
+    margin-top: 100px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #00B0EF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#restart-btn:hover {
+    background-color: #008dc1;
+}
