@@ -13,6 +13,7 @@ body {
     align-items: center;
     justify-content: flex-start;
     min-height: 100vh;
+    box-sizing: border-box;
 }
 
 h1 {
@@ -23,17 +24,20 @@ h1 {
 table {
     border-collapse: collapse;
     /* Wichtig für innere Linien */
-    margin-top: 100px;
+    margin-top: 50px;
+    border-spacing: 0;
+    /*display: flex;
+    justify-content: center;
+    align-items: center;*/
 }
 
 /* Zellen */
 td {
+    box-sizing: border-box;
     width: 100px;
-    height: 100px;
+    height: 100px;    
     text-align: center;
     vertical-align: middle;
-    font-size: 3em;
-    color: white;
     border: 6px solid white;
     cursor: pointer;
 }
@@ -73,4 +77,28 @@ tr:last-child td {
 #restart-btn:hover {
     background-color: #008dc1;
 }
+
+@keyframes drawLine {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.winning-line-wrapper {
+  position: absolute;
+  transform-origin: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.winning-line {
+  height: 6px;
+  background-color: #FFFFFF;
+  transform-origin: left center;
+  animation: drawLine 0.4s ease-out forwards;
+}
+
 

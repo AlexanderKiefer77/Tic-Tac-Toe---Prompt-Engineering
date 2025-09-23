@@ -103,7 +103,7 @@ function getWinningPattern() {
 }
 
 function drawWinningLine(pattern) {
-    const lineColor = '#FFFFFF';
+    const extraLength = 40;
     const lineWidth = 6;
 
     const cells = document.querySelectorAll('td');
@@ -113,43 +113,44 @@ function drawWinningLine(pattern) {
     const startRect = startCell.getBoundingClientRect();
     const endRect = endCell.getBoundingClientRect();
 
-    // Mittelpunkt der Start- und Endzelle
     const startX = startRect.left + startRect.width / 2;
     const startY = startRect.top + startRect.height / 2;
     const endX = endRect.left + endRect.width / 2;
     const endY = endRect.top + endRect.height / 2;
 
-    // Richtung & Länge
-    const deltaX = endX - startX;
-    const deltaY = endY - startY;
-    const angle = Math.atan2(deltaY, deltaX); // in rad
-    const angleDeg = angle * (180 / Math.PI);
-    const originalLength = Math.hypot(deltaX, deltaY);
+    const dx = endX - startX;
+    const dy = endY - startY;
+    const angleRad = Math.atan2(dy, dx);
+    const angleDeg = angleRad * (180 / Math.PI);
 
-    // 💡 Verlängerung (z. B. 40px insgesamt – 20px je Seite)
-    const extraLength = 40;
-    const totalLength = originalLength + extraLength;
+    const length = Math.hypot(dx, dy) + extraLength;
 
-    // Startpunkt nach hinten verschieben (entlang der Linie)
-    const adjustedStartX = startX - Math.cos(angle) * (extraLength / 2);
-    const adjustedStartY = startY - Math.sin(angle) * (extraLength / 2);
+    const offsetX = Math.cos(angleRad) * (extraLength / 2);
+    const offsetY = Math.sin(angleRad) * (extraLength / 2);
+    const adjustedX = startX - offsetX;
+    const adjustedY = startY - offsetY;
+
+    // ⬅️ Hier wird mittig zentriert (sehr wichtig!)
+    const wrapper = document.createElement('div');
+    wrapper.classList.add('winning-line-wrapper');
+    wrapper.style.position = 'absolute';
+    wrapper.style.left = `${adjustedX}px`;
+    wrapper.style.top = `${adjustedY}px`; // vertikal zentrieren
+    wrapper.style.width = `${length}px`;
+    wrapper.style.height = `${lineWidth}px`;
+    wrapper.style.transform = `rotate(${angleDeg}deg)`;
+    wrapper.style.transformOrigin = 'left center';
+    wrapper.style.zIndex = 10;
+    wrapper.style.pointerEvents = 'none';
 
     const line = document.createElement('div');
-    line.classList.add('winning-line'); // für späteres Entfernen
-    line.style.position = 'absolute';
-    line.style.width = `${totalLength}px`;
-    line.style.height = `${lineWidth}px`;
-    line.style.backgroundColor = lineColor;
-    line.style.left = `${adjustedStartX}px`;
-    line.style.top = `${adjustedStartY - lineWidth / 2}px`; // vertikal zentrieren
-    line.style.transform = `rotate(${angleDeg}deg)`;
-    line.style.transformOrigin = '0 50%';
-    line.style.zIndex = 10;
-    line.style.pointerEvents = 'none';
+    line.classList.add('winning-line');
+    line.style.width = '100%';
+    line.style.height = '100%';
 
-    document.body.appendChild(line);
+    wrapper.appendChild(line);
+    document.body.appendChild(wrapper);
 }
-
 
 function checkWinner() {  
     for (const pattern of winPatterns) {
